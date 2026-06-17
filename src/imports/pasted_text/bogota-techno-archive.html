@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bogotá Techno Archive</title>
+    <style>
+        /* Tipografía de terminal */
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: #0A0A0A;
+            color: #F0F0F0;
+            font-family: 'Share Tech Mono', monospace;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Estática de ruido */
+        #noise-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0.12;
+            z-index: 0;
+        }
+        
+        /* Contenedor principal */
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            width: 90%;
+            padding: 2rem;
+            border: 1px solid #FF0033;
+            box-shadow: 0 0 40px rgba(255, 0, 51, 0.1);
+            border-radius: 0;
+        }
+        
+        /* Estilo de terminal */
+        .sys-online {
+            color: #FF0033;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .cursor-blink {
+            animation: blink 1s step-end infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        
+        .title {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #F0F0F0;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+        }
+        
+        .subtitle {
+            color: #FF0033;
+            font-size: 1rem;
+            letter-spacing: 2px;
+            margin-bottom: 2rem;
+        }
+        
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        .nav-item {
+            background: transparent;
+            border: 1px solid #F0F0F0;
+            padding: 1rem 0.5rem;
+            text-align: center;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.9rem;
+            color: #F0F0F0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-radius: 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .nav-item:hover {
+            background-color: #FF0033;
+            color: #0A0A0A;
+            border-color: #FF0033;
+        }
+        
+        .question {
+            font-size: 1.8rem;
+            color: #F0F0F0;
+            text-align: center;
+            margin: 2rem 0;
+            line-height: 1.4;
+            font-weight: bold;
+        }
+        
+        .signal {
+            color: #FF0033;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            margin-top: 1rem;
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 1rem;
+        }
+        
+        .blink-signal {
+            animation: blinkSignal 1s step-end infinite;
+        }
+        
+        @keyframes blinkSignal {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        
+        /* Efecto de entrada tipo terminal */
+        .typewriter {
+            overflow: hidden;
+            white-space: nowrap;
+            border-right: 2px solid #FF0033;
+            animation: typing 3s steps(30) 1s forwards, blink 1s step-end infinite;
+            width: 0;
+        }
+        
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Estática de fondo (canvas) -->
+    <canvas id="noise-overlay"></canvas>
+    
+    <!-- Contenido principal -->
+    <div class="container">
+        <div class="sys-online">
+            SYS.ONLINE
+            <span class="cursor-blink">█</span>
+        </div>
+        
+        <h1 class="title">BOGOTÁ TECHNO.ARCHIVE</h1>
+        <div class="subtitle">ARCHIVO DIGITAL // ÉPOCA 1998 - 2002</div>
+        
+        <div class="nav-grid">
+            <button class="nav-item" data-target="artistas">ARTISTAS</button>
+            <button class="nav-item" data-target="colectivos">COLECTIVOS</button>
+            <button class="nav-item" data-target="tracks">TRACKS</button>
+            <button class="nav-item" data-target="lugares">LUGARES</button>
+            <button class="nav-item" data-target="linea">LÍNEA DE TIEMPO</button>
+        </div>
+        
+        <div class="question">
+            ¿QUÉ ESTABA PASANDO EN BOGOTÁ<br>
+            MIENTRAS TÚ AÚN NO ESCUCHABAS TECHNO?
+        </div>
+        
+        <div class="signal">
+            <span>4° 35' 56" N, 4° 35' 56" O</span>
+            <span class="blink-signal">SIGNAL_DETECTED</span>
+        </div>
+    </div>
+
+    <script>
+        // ========================================
+        // 1. ESTÁTICA DE FONDO (CANVAS)
+        // ========================================
+        const canvas = document.getElementById('noise-overlay');
+        const ctx = canvas.getContext('2d');
+        
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        
+        function generateNoise() {
+            const imageData = ctx.createImageData(canvas.width, canvas.height);
+            const data = imageData.data;
+            for (let i = 0; i < data.length; i += 4) {
+                const value = Math.random() * 255;
+                data[i] = value;
+                data[i+1] = value;
+                data[i+2] = value;
+                data[i+3] = 255;
+            }
+            ctx.putImageData(imageData, 0, 0);
+            requestAnimationFrame(generateNoise);
+        }
+        generateNoise();
+
+        // ========================================
+        // 2. NAVEGACIÓN Y TRANSICIONES
+        // ========================================
+        document.querySelectorAll('.nav-item').forEach(button => {
+            button.addEventListener('click', function() {
+                // Simular navegación: cambia el texto de la pregunta
+                const target = this.dataset.target;
+                const questionEl = document.querySelector('.question');
+                
+                // Efecto de desvanecimiento
+                questionEl.style.transition = 'opacity 0.4s ease';
+                questionEl.style.opacity = '0';
+                
+                setTimeout(() => {
+                    const messages = {
+                        'artistas': 'Explora los artistas que forjaron la escena techno en Bogotá (1998-2002).',
+                        'colectivos': 'Conoce los colectivos que organizaron la escena underground.',
+                        'tracks': 'Escucha los tracks que sonaron en las bodegas y after-hours.',
+                        'lugares': 'Recorre los venues históricos de Chapinero y la Zona Industrial.',
+                        'linea': 'Navega por la línea de tiempo de la escena techno bogotana.'
+                    };
+                    questionEl.textContent = messages[target] || 'Categoría seleccionada.';
+                    questionEl.style.opacity = '1';
+                }, 500);
+            });
+        });
+
+        // ========================================
+        // 3. INDICADOR DE SEÑAL (BLINK)
+        // ========================================
+        // El CSS ya tiene la animación .blink-signal
+        // No se requiere más JS para este efecto.
+
+        console.log('BOGOTÁ TECHNO.ARCHIVE // SISTEMA INICIALIZADO');
+    </script>
+</body>
+</html>
